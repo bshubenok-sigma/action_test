@@ -7,6 +7,47 @@ on:
         - 'master'
 
 jobs:
+    openssl-checkout:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                submodules: 'recursive'
+            - name: Cleanup and pack
+              run: |
+                  rm -rf openssl/.git*
+                  tar -C openssl -czf openssl.tar.gz .
+            - name: Store libraries
+              uses: actions/upload-artifact@v3
+              with:
+                name: openssl.tar.gz
+                path: openssl.tar.gz
+
+    build-openssl-linux-x86-64:
+      runs-on: ubuntu-22.04
+      needs: [openssl-checkout]
+      steps:
+          - name: Download sources
+            uses: actions/download-artifact@v3
+            with:
+              name: openssl.tar.gz
+          - name: Unpack sources
+            run: |
+              mv openssl.tar.gz openssl/
+              cd openssl
+              tar -xf openssl.tar.gz
+          - name: Building
+            run: |
+              cd openssl
+              ./Configure linux-x86_64 no-ssl2 no-shared
+              make -j2
+          - name: Store libraries
+            uses: actions/upload-artifact@v3
+            with:
+              name: openssl-linux-x86-64
+              path: openssl/lib*.a
+
     # build-openssl-ios-arm64:
     #     runs-on: macos-12
     #     steps:
@@ -42,23 +83,7 @@ jobs:
     #           with:
     #             submodules: 'recursive'
 
-    build-openssl-linux-x86-64:
-        runs-on: ubuntu-22.04
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-              with:
-                submodules: 'recursive'
-            - name: Building
-              run: |
-                cd openssl
-                ./Configure linux-x86_64 no-ssl2 no-shared
-                make -j2
-            - name: Store libraries
-              uses: actions/upload-artifact@v3
-              with:
-                name: Store libraries
-                path: openssl/lib*.a
+
 
     # build-ffmpeg-ios-arm64:
     #     runs-on: macos-12
