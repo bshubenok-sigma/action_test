@@ -28,7 +28,9 @@ jobs:
       runs-on: ubuntu-22.04
       needs: [openssl-checkout]
       steps:
-          - name: Download sources
+          - name: Checkout
+            uses: actions/checkout@v4
+          - name: Download OpenSSL
             uses: actions/download-artifact@v3
             with:
               name: openssl.tar.gz
