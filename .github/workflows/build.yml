@@ -58,7 +58,7 @@ jobs:
               uses: actions/upload-artifact@v3
               with:
                 name: Store libraries
-                path: lib*.a
+                path: openssl/lib*.a
 
     # build-ffmpeg-ios-arm64:
     #     runs-on: macos-12
