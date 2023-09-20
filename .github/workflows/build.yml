@@ -1,0 +1,100 @@
+name: Build libs
+
+
+on:
+    push:
+      branches:
+        - 'master'
+
+jobs:
+    # build-openssl-ios-arm64:
+    #     runs-on: macos-12
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-openssl-ios-x86-64:
+    #     runs-on: macos-12
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-openssl-arm64-v8a:
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-openssl-armeabi-v7a:
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-openssl-x86-64:
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    build-openssl-linux-x86-64:
+        runs-on: ubuntu-22.04
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                submodules: 'recursive'
+            - run: cd openssl
+            - run: ./Configure linux-x86_64 no-ssl2 no-shared
+            - name: Building
+              run: make -j2
+            - name: Store libraries
+              uses: actions/upload-artifact@v3
+              with:
+                name: Store libraries
+                path: lib*.a
+
+    # build-ffmpeg-ios-arm64:
+    #     runs-on: macos-12
+    #     needs: [build-openssl-ios-arm64]
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-ffmpeg-ios-x86-64:
+    #     needs: [build-openssl-ios-x86-64]
+    #     runs-on: macos-12
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-ffmpeg-arm64-v8a:
+    #     needs: [build-openssl-arm64-v8a]
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-ffmpeg-armeabi-v7a:
+    #     needs: [build-openssl-armeabi-v7a]
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
+    # build-ffmpeg-x86-64:
+    #     needs: [build-openssl-x86-64]
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         - uses: actions/checkout@v4
+    #           with:
+    #             submodules: 'recursive'
+
