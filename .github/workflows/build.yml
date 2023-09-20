@@ -45,13 +45,15 @@ jobs:
     build-openssl-linux-x86-64:
         runs-on: ubuntu-22.04
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
               with:
                 submodules: 'recursive'
-            - run: cd openssl
-            - run: ./Configure linux-x86_64 no-ssl2 no-shared
             - name: Building
-              run: make -j2
+              run: |
+                cd openssl
+                ./Configure linux-x86_64 no-ssl2 no-shared
+                make -j2
             - name: Store libraries
               uses: actions/upload-artifact@v3
               with:
