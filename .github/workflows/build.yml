@@ -53,9 +53,9 @@ jobs:
           run: |
             cd openssl
             ./Configure ios64-xcrun no-ssl2 no-shared
-            MAKEFLAGS=silent make -j3
+            MAKEFLAGS=silent make -j2
             cd ..
-            tar -C openssl -czf openssl-ios-arm64.tar.gz ./lib*.a
+            tar -C openssl -czf openssl-ios-arm64.tar.gz libssl.a libcrypto.a
         - name: Store libraries
           uses: actions/upload-artifact@v3
           with:
