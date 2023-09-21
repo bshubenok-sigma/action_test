@@ -1,0 +1,43 @@
+CONFIGURATION="--enable-debug --enable-cross-compile --enable-shared --enable-pic $3 \
+               --disable-doc \
+               --disable-programs \
+               --disable-asm \
+               --disable-symver \
+               --disable-doc \
+               --disable-postproc \
+               --disable-encoders \
+               --disable-decoders \
+               --disable-devices \
+               --disable-filters \
+               --disable-demuxers \
+               --disable-muxers \
+               --disable-parsers \
+               --disable-protocols \
+               --disable-bsfs \
+               --disable-iconv \
+               --disable-libass \
+               --enable-filter=format \
+               --enable-filter=aformat \
+               --enable-filter=scale \
+               --enable-filter=aresample \
+               --enable-filter=crop \
+               --enable-openssl \
+               --enable-encoder=aac \
+               --enable-encoder=opus \
+               --enable-decoder=aac \
+               --enable-decoder=h264 \
+               --enable-protocol=rtmp \
+               --enable-protocol=rtmps \
+               --enable-protocol=tls \
+               --enable-protocol=file \
+               --enable-parser=aac \
+               --enable-parser=h264 \
+               --enable-parser=opus \
+               --enable-muxer=opus \
+               --enable-muxer=h264 \
+               --enable-muxer=flv \
+               --enable-muxer=mp4 \
+               --enable-demuxer=aac \
+               --enable-demuxer=flv \
+               --enable-demuxer=h264
+               "
