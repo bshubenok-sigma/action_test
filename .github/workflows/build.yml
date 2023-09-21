@@ -17,9 +17,9 @@ jobs:
             - name: Cleanup and pack
               run: |
                   rm -rf openssl/.git*
-                  rm -rf ffmpeg/.git*
+                  rm -rf FFmpeg/.git*
                   tar -C openssl -czf openssl.tar.gz .
-                  tar -C ffmpeg -czf ffmpeg.tar.gz .
+                  tar -C FFmpeg -czf ffmpeg.tar.gz .
             - name: Store OpenSSL libraries
               uses: actions/upload-artifact@v3
               with:
@@ -84,16 +84,16 @@ jobs:
             run: |
               mv openssl.tar.gz openssl/
               mv openssl-ios-arm64.tar.gz openssl/
-              mv ffmpeg.tar.gz ffmpeg/
+              mv ffmpeg.tar.gz FFmpeg/
               cd openssl
               tar -xf openssl.tar.gz
               tar -xf openssl-ios-arm64.tar.gz
-              cd ../ffmpeg
+              cd ../FFmpeg
               tar -xf ffmpeg.tar.gz
           - name: Build
             run: |
               bash build_ffmpeg_ios.sh
-              tar -C ffmpeg -czf ffmpeg-ios-arm64.tar.gz ./build
+              tar -C FFmpeg -czf ffmpeg-ios-arm64.tar.gz ./build
           - name: Store libraries
             uses: actions/upload-artifact@v3
             with:

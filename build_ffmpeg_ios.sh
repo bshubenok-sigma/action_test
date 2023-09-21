@@ -7,7 +7,7 @@ source ffmpeg_configuration
 
 # Settings
 TARGET=iphoneos
-FFMPEG_DIR=./ffmpeg
+FFMPEG_DIR=./FFmpeg
 OPENSSL_DIR=`pwd`/openssl
 CC="xcrun --sdk $TARGET cc"
 SYSROOT=$(xcrun --sdk $TARGET --show-sdk-path)
