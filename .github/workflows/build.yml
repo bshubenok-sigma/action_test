@@ -8,33 +8,36 @@ on:
 
 jobs:
     openssl-checkout:
-        runs-on: ubuntu-22.04
+        runs-on: macos-12
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-              with:
-                submodules: 'recursive'
-            - name: Cleanup and pack
-              run: |
-                  rm -rf openssl/.git*
-                  rm -rf FFmpeg/.git*
-                  tar -C openssl -czf openssl.tar.gz .
-                  tar -C FFmpeg -czf ffmpeg.tar.gz .
-            - name: Store OpenSSL libraries
-              uses: actions/upload-artifact@v3
-              with:
-                name: openssl.tar.gz
-                path: openssl.tar.gz
-            - name: Store FFmpeg libraries
-              uses: actions/upload-artifact@v3
-              with:
-                name: ffmpeg.tar.gz
-                path: ffmpeg.tar.gz
+          - name: Checkout
+            uses: actions/checkout@v4
+            with:
+              submodules: 'recursive'
+          - name: Cleanup and pack
+            run: |
+                rm -rf openssl/.git*
+                rm -rf FFmpeg/.git*
+                tar -C openssl -czf openssl.tar.gz .
+                tar -C FFmpeg -czf ffmpeg.tar.gz .
+          - name: Store OpenSSL libraries
+            uses: actions/upload-artifact@v3
+            with:
+              name: openssl.tar.gz
+              path: openssl.tar.gz
+          - name: Store FFmpeg libraries
+            uses: actions/upload-artifact@v3
+            with:
+              name: ffmpeg.tar.gz
+              path: ffmpeg.tar.gz
 
 
-    build-openssl-ios-arm64:
+    build-openssl-ios:
       runs-on: macos-12
       needs: [openssl-checkout]
+      strategy:
+        matrix:
+          target: ["ios-arm64", "ios-x86-64"]
       steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -51,20 +54,20 @@ jobs:
             tar -xf openssl.tar.gz
         - name: Building
           run: |
-            cd openssl
-            ./Configure ios64-xcrun no-ssl2 no-shared
-            MAKEFLAGS=silent make -j2
-            cd ..
-            tar -C openssl -czf openssl-ios-arm64.tar.gz libssl.a libcrypto.a
+            ./build_openssl.sh `pwd`/openssl ${{matrix.target}}
+            tar -C openssl -czf openssl-${{matrix.target}}.tar.gz libssl.a libcrypto.a
         - name: Store libraries
           uses: actions/upload-artifact@v3
           with:
-            name: openssl-ios-arm64.tar.gz
-            path: openssl-ios-arm64.tar.gz
+            name: openssl-${{matrix.target}}.tar.gz
+            path: openssl-${{matrix.target}}.tar.gz
 
-    build-ffmpeg-ios-arm64:
+    build-ffmpeg:
         runs-on: macos-12
-        needs: [build-openssl-ios-arm64]
+        needs: [build-openssl-ios]
+        strategy:
+          matrix:
+            target: ["ios-arm64", "ios-x86-64"]
         steps:
           - uses: actions/checkout@v4
             with:
@@ -76,7 +79,7 @@ jobs:
           - name: Download OpenSSL libs
             uses: actions/download-artifact@v3
             with:
-              name: openssl-ios-arm64.tar.gz
+              name: openssl-${{matrix.target}}.tar.gz
           - name: Download FFmpeg  source
             uses: actions/download-artifact@v3
             with:
@@ -84,116 +87,26 @@ jobs:
           - name: Unpack sources
             run: |
               mv openssl.tar.gz openssl/
-              mv openssl-ios-arm64.tar.gz openssl/
+              mv openssl-${{matrix.target}}.tar.gz openssl/
               mv ffmpeg.tar.gz FFmpeg/
               cd openssl
               tar -xf openssl.tar.gz
-              tar -xf openssl-ios-arm64.tar.gz
+              tar -xf openssl-${{matrix.target}}.tar.gz
               cd ../FFmpeg
               tar -xf ffmpeg.tar.gz
           - name: Build
             run: |
-              bash build_ffmpeg_ios.sh
-              tar -C FFmpeg -czf ffmpeg-ios-arm64.tar.gz ./build
+              bash build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl ${{matrix.target}}
+              tar -C FFmpeg -czf ffmpeg-${{matrix.target}}.tar.gz ./build
           - name: Store libraries
             uses: actions/upload-artifact@v3
             with:
-              name: ffmpeg-ios-arm64.tar.gz
-              path: ffmpeg-ios-arm64.tar.gz
-
-    # build-openssl-ios-arm64:
-    #
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
-
-    # build-openssl-ios-x86-64:
-    #     runs-on: macos-12
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
+              name: ffmpeg-${{matrix.target}}.tar.gz
+              path: ffmpeg-${{matrix.target}}.tar.gz
 
     # build-openssl-arm64-v8a:
-    #     runs-on: ubuntu-22.04
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
-
     # build-openssl-armeabi-v7a:
-    #     runs-on: ubuntu-22.04
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
-
     # build-openssl-x86-64:
-    #     runs-on: ubuntu-22.04
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
-
-
-
     # build-ffmpeg-ios-x86-64:
-    #     needs: [build-openssl-ios-x86-64]
-    #     runs-on: macos-12
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
-
     # build-ffmpeg-arm64-v8a:
-    #     needs: [build-openssl-arm64-v8a]
-    #     runs-on: ubuntu-22.04
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
-
     # build-ffmpeg-armeabi-v7a:
-    #     needs: [build-openssl-armeabi-v7a]
-    #     runs-on: ubuntu-22.04
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
-
-
-
-        # build-openssl-linux-x86-64:
-    #   runs-on: ubuntu-22.04
-    #   needs: [openssl-checkout]
-    #   steps:
-    #       - name: Checkout
-    #         uses: actions/checkout@v4
-    #       - name: Download OpenSSL
-    #         uses: actions/download-artifact@v3
-    #         with:
-    #           name: openssl.tar.gz
-    #       - name: Unpack sources
-    #         run: |
-    #           mv openssl.tar.gz openssl/
-    #           cd openssl
-    #           tar -xf openssl.tar.gz
-    #       - name: Building
-    #         run: |
-    #           cd openssl
-    #           ./Configure linux-x86_64 no-ssl2 no-shared
-    #           MAKEFLAGS=silent make -j2
-    #       - name: Store libraries
-    #         uses: actions/upload-artifact@v3
-    #         with:
-    #           name: openssl-linux-x86-64
-    #           path: openssl/lib*.a
-
-    # build-ffmpeg-x86-64:
-    #     needs: [build-openssl-linux-x86-64]
-    #     runs-on: ubuntu-22.04
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #           with:
-    #             submodules: 'recursive'
