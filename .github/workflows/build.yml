@@ -37,7 +37,8 @@ jobs:
       needs: [openssl-checkout]
       strategy:
         matrix:
-          target: ["ios-arm64", "ios-x86-64"]
+          target: ["ios-arm64"]
+          # target: ["ios-arm64", "ios-x86-64"]
       steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -67,7 +68,7 @@ jobs:
         needs: [build-openssl-ios]
         strategy:
           matrix:
-            target: ["ios-arm64", "ios-x86-64"]
+            target: ["ios-arm64"]
         steps:
           - uses: actions/checkout@v4
             with:
@@ -96,7 +97,7 @@ jobs:
               tar -xf ffmpeg.tar.gz
           - name: Build
             run: |
-              sh build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl ${{matrix.target}}
+              sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl ${{matrix.target}}
               tar -C FFmpeg -czf ffmpeg-${{matrix.target}}.tar.gz ./build
           - name: Store libraries
             uses: actions/upload-artifact@v3
