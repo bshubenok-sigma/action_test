@@ -95,6 +95,11 @@ jobs:
               tar -xf openssl-${{matrix.target}}.tar.gz
               cd ../FFmpeg
               tar -xf ffmpeg.tar.gz
+          - name: Prepare environment
+            run: |
+              brew install nasm
+              chmod +x ./tools/gas-preprocessor.pl
+              export PATH=$PATH:`pwd`/tools
           - name: Build
             run: |
               sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl ${{matrix.target}}

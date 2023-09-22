@@ -1,4 +1,4 @@
-CONFIGURATION="--enable-debug --enable-cross-compile --enable-shared --enable-pic \
+CONFIGURATION="--enable-debug --enable-shared --enable-pic \
                --disable-doc \
                --disable-programs \
                --disable-asm \

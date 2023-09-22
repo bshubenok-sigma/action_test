@@ -10,19 +10,27 @@ FFMPEG_DIR=$1
 OPENSSL_DIR=$2
 TARGET=$3
 
+DEPLOYMENT_TARGET="8.0"
+
 
 case $TARGET in
     ios-x86-64)
         PLATFORM=iphonesimulator
         ARCH="x86_64"
+        TARGET_OS="darwin"
         CC="xcrun --sdk $PLATFORM clang"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
+        CFLAGS="$CFLAGS -mios-simulator-version-min=$DEPLOYMENT_TARGET"
+        AS="gas-preprocessor.pl -- $CC"
         ;;
     ios-arm64)
         PLATFORM=iphoneos
         ARCH="arm64"
+        TARGET_OS="darwin"
         CC="xcrun --sdk $PLATFORM clang"
+        CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
+        AS="gas-preprocessor.pl -arch aarch64 -- $CC"
         ;;
     # android-arm64-v8a)
     #     ;;
@@ -36,13 +44,19 @@ case $TARGET in
         ;;
 esac
 
+CXXFLAGS="$CFLAGS"
+LDFLAGS="$CFLAGS"
+
 # cd into ffmpeg root directory and build ffmpeg
 pushd $FFMPEG_DIR
         ./configure $CONFIGURATION \
+                --enable-cross-compile \
                 --cc="$CC" \
+                --as="$AS" \
                 --arch="$ARCH" \
                 --sysroot="$SYSROOT" \
-                --prefix="build" \
+                --target-os="$TARGET_OS" \
+                --prefix=`pwd`/"build" \
                 --extra-cflags="-I$OPENSSL_DIR/include" \
                 --extra-ldflags="-L$OPENSSL_DIR" || cat ffbuild/config.log ; exit
         make -j3
