@@ -4,7 +4,7 @@ set -e
 OPENSSL_DIR=$1
 TARGET=$2
 
-cd OPENSSL_DIR
+cd $OPENSSL_DIR
 
 case $TARGET in
     ios-x86-64)
