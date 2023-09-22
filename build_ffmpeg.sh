@@ -16,13 +16,13 @@ case $TARGET in
         PLATFORM=iphonesimulator
         ARCH="x86_64"
         CC="xcrun --sdk $PLATFORM clang"
-        SYSROOT=$(xcrun --sdk $TARGET --show-sdk-path)
+        SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         ;;
     ios-arm64)
         PLATFORM=iphoneos
         ARCH="arm64"
         CC="xcrun --sdk $PLATFORM clang"
-        SYSROOT=$(xcrun --sdk $TARGET --show-sdk-path)
+        SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         ;;
     # android-arm64-v8a)
     #     ;;
