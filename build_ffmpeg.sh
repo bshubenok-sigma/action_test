@@ -30,12 +30,12 @@ case $TARGET in
         CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
         AS="gas-preprocessor.pl -arch ${ARCH} -- $CC"
         ;;
-    # android-arm64-v8a)
-    #     ;;
-    # android-armeabi-v7a)
-    #     ;;
-    # android-x86-64)
-    #     ;;
+    android-arm64)
+        ;;
+    android-armeabi)
+        ;;
+    android-x86-64)
+        ;;
     *)
         echo "Unknown target: $TARGET"
         exit 1

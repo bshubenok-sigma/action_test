@@ -1,6 +1,5 @@
 name: Build libs
 
-
 on:
     push:
       branches:
@@ -8,7 +7,7 @@ on:
 
 jobs:
     openssl-checkout:
-        runs-on: macos-12
+        runs-on: ubuntu-22.04
         steps:
           - name: Checkout
             uses: actions/checkout@v4
@@ -37,7 +36,7 @@ jobs:
       needs: [openssl-checkout]
       strategy:
         matrix:
-          target: ["ios-arm64", "ios-x86-64", "android-arm64-v8a", "android-armeabi-v7a", "android-x86-64" ]
+          target: ["ios-arm64", "ios-x86-64"]
       steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -56,20 +55,20 @@ jobs:
           run: |
             mkdir -p openssl_install
             sh build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
-            tar -C openssl_install -czf openssl-install-${{matrix.target}}.tar.gz .
+            tar -C openssl_install -czf openssl-${{matrix.target}}.tar.gz .
 
         - name: Store build artifacts
           uses: actions/upload-artifact@v3
           with:
-            name: openssl-install-${{matrix.target}}.tar.gz
-            path: openssl-install-${{matrix.target}}.tar.gz
+            name: openssl-${{matrix.target}}.tar.gz
+            path: openssl-${{matrix.target}}.tar.gz
 
-    build-ffmpeg:
+    build-ffmpeg-ios:
         runs-on: macos-12
         needs: [build-openssl-ios]
         strategy:
           matrix:
-            target: ["ios-arm64", "ios-x86-64"]
+            target: ["ios-arm64", "ios-x86-64" ]
         steps:
           - uses: actions/checkout@v4
             with:
@@ -77,7 +76,7 @@ jobs:
           - name: Download OpenSSL libs
             uses: actions/download-artifact@v3
             with:
-              name: openssl-install-${{matrix.target}}.tar.gz
+              name: openssl-${{matrix.target}}.tar.gz
           - name: Download FFmpeg  source
             uses: actions/download-artifact@v3
             with:
@@ -85,10 +84,10 @@ jobs:
           - name: Unpack sources
             run: |
               mkdir -p ./ffmpeg_install
-              mv openssl-install-${{matrix.target}}.tar.gz openssl/
+              mv openssl-${{matrix.target}}.tar.gz openssl/
               mv ffmpeg.tar.gz FFmpeg/
               cd openssl
-              tar -xf openssl-install-${{matrix.target}}.tar.gz
+              tar -xf openssl-${{matrix.target}}.tar.gz
               cd ../FFmpeg
               tar -xf ffmpeg.tar.gz
           - name: Prepare environment
@@ -106,9 +105,75 @@ jobs:
               name: ffmpeg-${{matrix.target}}.tar.gz
               path: ffmpeg-${{matrix.target}}.tar.gz
 
-    # build-openssl-arm64-v8a:
-    # build-openssl-armeabi-v7a:
-    # build-openssl-x86-64:
-    # build-ffmpeg-ios-x86-64:
-    # build-ffmpeg-arm64-v8a:
-    # build-ffmpeg-armeabi-v7a:
+
+    build-openssl-android:
+      runs-on: ubuntu-22.04
+      needs: [openssl-checkout]
+      strategy:
+        matrix:
+          target: [ "android-arm64-v8a", "android-armeabi-v7a", "android-x86-64" ]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            submodules: 'false'
+        - name: Download OpenSSL
+          uses: actions/download-artifact@v3
+          with:
+            name: openssl.tar.gz
+        - name: Unpack sources
+          run: |
+            mv openssl.tar.gz openssl/
+            cd openssl
+            tar -xf openssl.tar.gz
+        - name: Building
+          run: |
+            mkdir -p openssl_install
+            sh build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
+            tar -C openssl_install -czf openssl-${{matrix.target}}.tar.gz .
+
+        - name: Store build artifacts
+          uses: actions/upload-artifact@v3
+          with:
+            name: openssl-${{matrix.target}}.tar.gz
+            path: openssl-${{matrix.target}}.tar.gz
+
+
+    build-ffmpeg-android:
+      runs-on: ubuntu-22.04
+      needs: [build-openssl-android]
+      strategy:
+        matrix:
+          target: [ "android-arm64-v8a", "android-armeabi-v7a", "android-x86-64" ]
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            submodules: 'false'
+        - name: Download OpenSSL libs
+          uses: actions/download-artifact@v3
+          with:
+            name: openssl-${{matrix.target}}.tar.gz
+        - name: Download FFmpeg sources
+          uses: actions/download-artifact@v3
+          with:
+            name: ffmpeg.tar.gz
+        - name: Unpack sources
+          run: |
+            mkdir -p ./ffmpeg_install
+            mv openssl-${{matrix.target}}.tar.gz openssl/
+            mv ffmpeg.tar.gz FFmpeg/
+            cd openssl
+            tar -xf openssl-${{matrix.target}}.tar.gz
+            cd ../FFmpeg
+            tar -xf ffmpeg.tar.gz
+        - name: Build
+          run: |
+            sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/ffmpeg_install  ${{matrix.target}}
+            tar -C ffmpeg_install -czf ffmpeg-${{matrix.target}}.tar.gz .
+        - name: Store libraries
+          uses: actions/upload-artifact@v3
+          with:
+            name: ffmpeg-${{matrix.target}}.tar.gz
+            path: ffmpeg-${{matrix.target}}.tar.gz
+
+
