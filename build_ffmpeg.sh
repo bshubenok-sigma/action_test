@@ -56,7 +56,7 @@ pushd $FFMPEG_DIR
                 --sysroot="$SYSROOT" \
                 --prefix="$PREFIX" \
                 --extra-cflags="-I$OPENSSL_DIR/include" \
-                --extra-ldflags="-L$OPENSSL_DIR" || cat ffbuild/config.log ; exit
+                --extra-ldflags="-L$OPENSSL_DIR/lib" || cat ffbuild/config.log ; exit
         make -j3
         make install
 popd
