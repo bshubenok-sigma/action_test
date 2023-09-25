@@ -32,40 +32,40 @@ jobs:
               path: ffmpeg.tar.gz
 
 
-    build-openssl-ios:
-      runs-on: macos-12
-      needs: [openssl-checkout]
-      strategy:
-        matrix:
-          target: ["ios-arm64"]
-          # target: ["ios-arm64", "ios-x86-64"]
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-          with:
-            submodules: 'false'
-        - name: Download OpenSSL
-          uses: actions/download-artifact@v3
-          with:
-            name: openssl.tar.gz
-        - name: Unpack sources
-          run: |
-            mv openssl.tar.gz openssl/
-            cd openssl
-            tar -xf openssl.tar.gz
-        - name: Building
-          run: |
-            sh build_openssl.sh `pwd`/openssl ${{matrix.target}}
-            tar -C openssl -czf openssl-${{matrix.target}}.tar.gz libssl.a libcrypto.a
-        - name: Store libraries
-          uses: actions/upload-artifact@v3
-          with:
-            name: openssl-${{matrix.target}}.tar.gz
-            path: openssl-${{matrix.target}}.tar.gz
+    # build-openssl-ios:
+    #   runs-on: macos-12
+    #   needs: [openssl-checkout]
+    #   strategy:
+    #     matrix:
+    #       target: ["ios-arm64"]
+    #       # target: ["ios-arm64", "ios-x86-64"]
+    #   steps:
+    #     - name: Checkout
+    #       uses: actions/checkout@v4
+    #       with:
+    #         submodules: 'false'
+    #     - name: Download OpenSSL
+    #       uses: actions/download-artifact@v3
+    #       with:
+    #         name: openssl.tar.gz
+    #     - name: Unpack sources
+    #       run: |
+    #         mv openssl.tar.gz openssl/
+    #         cd openssl
+    #         tar -xf openssl.tar.gz
+    #     - name: Building
+    #       run: |
+    #         sh build_openssl.sh `pwd`/openssl ${{matrix.target}}
+    #         tar -C openssl -czf openssl-${{matrix.target}}.tar.gz libssl.a libcrypto.a
+    #     - name: Store libraries
+    #       uses: actions/upload-artifact@v3
+    #       with:
+    #         name: openssl-${{matrix.target}}.tar.gz
+    #         path: openssl-${{matrix.target}}.tar.gz
 
     build-ffmpeg:
         runs-on: macos-12
-        needs: [build-openssl-ios]
+        # needs: [build-openssl-ios]
         strategy:
           matrix:
             target: ["ios-arm64"]

@@ -27,7 +27,6 @@ case $TARGET in
     ios-arm64)
         PLATFORM=iphoneos
         ARCH="arm64"
-        TARGET_OS="darwin"
         CC="xcrun --sdk $PLATFORM clang"
         LD="xcrun --sdk $PLATFORM clang"
         CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
@@ -58,7 +57,6 @@ pushd $FFMPEG_DIR
                 --ld="$LD" \
                 --arch="$ARCH" \
                 --sysroot="$SYSROOT" \
-                --target-os="$TARGET_OS" \
                 --prefix=`pwd`/"build" \
                 --extra-cflags="-I$OPENSSL_DIR/include" \
                 --extra-ldflags="-L$OPENSSL_DIR" || cat ffbuild/config.log ; exit
