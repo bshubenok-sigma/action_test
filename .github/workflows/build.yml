@@ -66,6 +66,7 @@ jobs:
     build-ffmpeg:
         runs-on: macos-12
         # needs: [build-openssl-ios]
+        needs: [openssl-checkout]
         strategy:
           matrix:
             target: ["ios-arm64"]
@@ -77,22 +78,22 @@ jobs:
             uses: actions/download-artifact@v3
             with:
               name: openssl.tar.gz
-          - name: Download OpenSSL libs
-            uses: actions/download-artifact@v3
-            with:
-              name: openssl-${{matrix.target}}.tar.gz
+          # - name: Download OpenSSL libs
+          #   uses: actions/download-artifact@v3
+          #   with:
+          #     name: openssl-${{matrix.target}}.tar.gz
           - name: Download FFmpeg  source
             uses: actions/download-artifact@v3
             with:
               name: ffmpeg.tar.gz
           - name: Unpack sources
             run: |
-              mv openssl.tar.gz openssl/
-              mv openssl-${{matrix.target}}.tar.gz openssl/
+              # mv openssl.tar.gz openssl/
+              # mv openssl-${{matrix.target}}.tar.gz openssl/
               mv ffmpeg.tar.gz FFmpeg/
-              cd openssl
-              tar -xf openssl.tar.gz
-              tar -xf openssl-${{matrix.target}}.tar.gz
+              # cd openssl
+              # tar -xf openssl.tar.gz
+              # tar -xf openssl-${{matrix.target}}.tar.gz
               cd ../FFmpeg
               tar -xf ffmpeg.tar.gz
           - name: Prepare environment
