@@ -38,5 +38,5 @@ case $TARGET in
 esac
 
 ./Configure $PLATFORM $EXTRA no-ssl2 no-shared --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
-MAKEFLAGS=make -j4
+make -j4
 make install
