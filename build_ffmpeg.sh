@@ -29,7 +29,7 @@ case $TARGET in
         ARCH="arm64"
         TARGET_OS="darwin"
         CC="xcrun --sdk $PLATFORM clang"
-        LD="xcrun --sdk $PLATFORM lld"
+        LD="xcrun --sdk $PLATFORM clang"
         CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         AS="gas-preprocessor.pl -arch aarch64 -- $CC"
