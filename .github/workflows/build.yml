@@ -86,10 +86,10 @@ jobs:
           - name: Unpack sources
             run: |
               mkdir -p ./ffmpeg_install
-              mv openssl-${{matrix.target}}.tar.gz openssl/
+              mv openssl-install-${{matrix.target}}.tar.gz openssl/
               mv ffmpeg.tar.gz FFmpeg/
               cd openssl
-              tar -xf openssl-${{matrix.target}}.tar.gz
+              tar -xf openssl-install-${{matrix.target}}.tar.gz
               cd ../FFmpeg
               tar -xf ffmpeg.tar.gz
           - name: Prepare environment
