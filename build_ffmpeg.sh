@@ -19,6 +19,7 @@ case $TARGET in
         ARCH="x86_64"
         TARGET_OS="darwin"
         CC="xcrun --sdk $PLATFORM clang"
+        LD="xcrun --sdk $PLATFORM lld"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         CFLAGS="$CFLAGS -mios-simulator-version-min=$DEPLOYMENT_TARGET"
         AS="gas-preprocessor.pl -- $CC"
@@ -28,6 +29,7 @@ case $TARGET in
         ARCH="arm64"
         TARGET_OS="darwin"
         CC="xcrun --sdk $PLATFORM clang"
+        LD="xcrun --sdk $PLATFORM lld"
         CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         AS="gas-preprocessor.pl -arch aarch64 -- $CC"
@@ -53,6 +55,7 @@ pushd $FFMPEG_DIR
                 --enable-cross-compile \
                 --cc="$CC" \
                 --as="$AS" \
+                --ld="$LD" \
                 --arch="$ARCH" \
                 --sysroot="$SYSROOT" \
                 --target-os="$TARGET_OS" \
