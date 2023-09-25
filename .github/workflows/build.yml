@@ -129,7 +129,7 @@ jobs:
         - name: Building
           run: |
             mkdir -p openssl_install
-            sh build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
+            sh -x build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
             tar -C openssl_install -czf openssl-${{matrix.target}}.tar.gz .
 
         - name: Store build artifacts

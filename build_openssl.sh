@@ -8,6 +8,7 @@ TARGET=$3
 
 mkdir -p $INSTALL_DIR
 cd $OPENSSL_DIR
+PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
 case $TARGET in
     ios-x86-64)
