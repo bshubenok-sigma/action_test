@@ -20,7 +20,7 @@ case $TARGET in
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         CC="$(xcrun --sdk $PLATFORM --find clang) -isysroot=${SYSROOT} -arch ${ARCH}"
         CFLAGS="$CFLAGS -mios-simulator-version-min=$DEPLOYMENT_TARGET"
-        AS="gas-preprocessor.pl -- $CC"
+        AS="gas-preprocessor.pl -arch ${ARCH} -- $CC"
         ;;
     ios-arm64)
         PLATFORM=iphoneos
@@ -28,7 +28,7 @@ case $TARGET in
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         CC="$(xcrun --sdk $PLATFORM --find clang) -isysroot=${SYSROOT} -arch ${ARCH}"
         CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
-        AS="gas-preprocessor.pl -arch aarch64 -- $CC"
+        AS="gas-preprocessor.pl -arch ${ARCH} -- $CC"
         ;;
     # android-arm64-v8a)
     #     ;;
