@@ -17,9 +17,7 @@ case $TARGET in
     ios-x86-64)
         PLATFORM=iphonesimulator
         ARCH="x86_64"
-        TARGET_OS="darwin"
         CC="xcrun --sdk $PLATFORM clang"
-        LD="xcrun --sdk $PLATFORM lld"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
         CFLAGS="$CFLAGS -mios-simulator-version-min=$DEPLOYMENT_TARGET"
         AS="gas-preprocessor.pl -- $CC"
@@ -27,10 +25,10 @@ case $TARGET in
     ios-arm64)
         PLATFORM=iphoneos
         ARCH="arm64"
-        CC="xcrun --sdk $PLATFORM clang"
-        LD="xcrun --sdk $PLATFORM clang"
-        CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
+        CC="$(xcrun --sdk $PLATFORM --find clang) -isysroot=${SYSROOT} -arch arm64"
+        # CC="xcrun --sdk $PLATFORM clang"
+        CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
         AS="gas-preprocessor.pl -arch aarch64 -- $CC"
         ;;
     # android-arm64-v8a)
@@ -54,7 +52,6 @@ pushd $FFMPEG_DIR
                 --enable-cross-compile \
                 --cc="$CC" \
                 --as="$AS" \
-                --ld="$LD" \
                 --arch="$ARCH" \
                 --sysroot="$SYSROOT" \
                 --prefix=`pwd`/"build" \
