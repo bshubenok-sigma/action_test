@@ -55,13 +55,21 @@ jobs:
             tar -xf openssl.tar.gz
         - name: Building
           run: |
-            sh build_openssl.sh `pwd`/openssl ${{matrix.target}}
+            mkdir -p openssl_install
+            sh build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
             tar -C openssl -czf openssl-${{matrix.target}}.tar.gz libssl.a libcrypto.a
+            tar -C openssl_install -czf openssl-src-${{matrix.target}}.tar.gz .
+
         - name: Store libraries
           uses: actions/upload-artifact@v3
           with:
             name: openssl-${{matrix.target}}.tar.gz
             path: openssl-${{matrix.target}}.tar.gz
+        - name: Store sources
+          uses: actions/upload-artifact@v3
+          with:
+            name: openssl-src-${{matrix.target}}.tar.gz
+            path: openssl-src-${{matrix.target}}.tar.gz
 
     build-ffmpeg:
         runs-on: macos-12

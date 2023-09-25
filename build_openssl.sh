@@ -2,16 +2,19 @@
 set -e
 
 OPENSSL_DIR=$1
-TARGET=$2
+INSTALL_DIR=$2
+TARGET=$3
 
+
+mkdir -p $INSTALL_DIR
 cd $OPENSSL_DIR
 
 case $TARGET in
     ios-x86-64)
-        ./Configure iossimulator-xcrun no-ssl2 no-shared
+        ./Configure iossimulator-xcrun no-ssl2 no-shared --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
         ;;
     ios-arm64)
-        ./Configure ios64-xcrun no-ssl2 no-shared
+        ./Configure ios64-xcrun no-ssl2 no-shared --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
         ;;
     # android-arm64-v8a)
     #     ./Configure ios64-xcrun no-ssl2 no-shared
@@ -28,4 +31,5 @@ case $TARGET in
         ;;
 esac
 
-MAKEFLAGS=silent make -j2
+MAKEFLAGS=silent make -j3
+make install
