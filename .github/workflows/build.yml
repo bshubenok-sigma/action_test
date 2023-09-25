@@ -94,7 +94,8 @@ jobs:
               # cd openssl
               # tar -xf openssl.tar.gz
               # tar -xf openssl-${{matrix.target}}.tar.gz
-              cd ../FFmpeg
+              # cd ../FFmpeg
+              cd ./FFmpeg
               tar -xf ffmpeg.tar.gz
           - name: Prepare environment
             run: |
