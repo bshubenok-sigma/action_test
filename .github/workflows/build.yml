@@ -100,7 +100,7 @@ jobs:
           - name: Build
             run: |
               sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/ffmpeg_install  ${{matrix.target}}
-              tar -C FFmpeg -czf ffmpeg-${{matrix.target}}.tar.gz ./build
+              tar -C ffmpeg_install -czf ffmpeg-${{matrix.target}}.tar.gz .
           - name: Store libraries
             uses: actions/upload-artifact@v3
             with:

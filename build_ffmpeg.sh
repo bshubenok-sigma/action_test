@@ -13,8 +13,6 @@ TARGET=$4
 
 DEPLOYMENT_TARGET="8.0"
 
-mkdir -p ./build
-
 case $TARGET in
     ios-x86-64)
         PLATFORM=iphonesimulator
