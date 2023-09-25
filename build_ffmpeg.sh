@@ -8,7 +8,8 @@ source ffmpeg_configuration
 # Settings
 FFMPEG_DIR=$1
 OPENSSL_DIR=$2
-TARGET=$3
+PREFIX=$3
+TARGET=$4
 
 DEPLOYMENT_TARGET="8.0"
 
@@ -17,8 +18,8 @@ case $TARGET in
     ios-x86-64)
         PLATFORM=iphonesimulator
         ARCH="x86_64"
-        CC="xcrun --sdk $PLATFORM clang"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
+        CC="$(xcrun --sdk $PLATFORM --find clang) -isysroot=${SYSROOT} -arch ${ARCH}"
         CFLAGS="$CFLAGS -mios-simulator-version-min=$DEPLOYMENT_TARGET"
         AS="gas-preprocessor.pl -- $CC"
         ;;
@@ -26,8 +27,7 @@ case $TARGET in
         PLATFORM=iphoneos
         ARCH="arm64"
         SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
-        CC="$(xcrun --sdk $PLATFORM --find clang) -isysroot=${SYSROOT} -arch arm64"
-        # CC="xcrun --sdk $PLATFORM clang"
+        CC="$(xcrun --sdk $PLATFORM --find clang) -isysroot=${SYSROOT} -arch ${ARCH}"
         CFLAGS="$CFLAGS -mios-version-min=$DEPLOYMENT_TARGET -fembed-bitcode"
         AS="gas-preprocessor.pl -arch aarch64 -- $CC"
         ;;
@@ -54,7 +54,7 @@ pushd $FFMPEG_DIR
                 --as="$AS" \
                 --arch="$ARCH" \
                 --sysroot="$SYSROOT" \
-                --prefix=`pwd`/"build" \
+                --prefix="$PREFIX" \
                 --extra-cflags="-I$OPENSSL_DIR/include" \
                 --extra-ldflags="-L$OPENSSL_DIR" || cat ffbuild/config.log ; exit
         make -j3

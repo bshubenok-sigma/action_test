@@ -32,41 +32,40 @@ jobs:
               path: ffmpeg.tar.gz
 
 
-    # build-openssl-ios:
-    #   runs-on: macos-12
-    #   needs: [openssl-checkout]
-    #   strategy:
-    #     matrix:
-    #       target: ["ios-arm64"]
-    #       # target: ["ios-arm64", "ios-x86-64"]
-    #   steps:
-    #     - name: Checkout
-    #       uses: actions/checkout@v4
-    #       with:
-    #         submodules: 'false'
-    #     - name: Download OpenSSL
-    #       uses: actions/download-artifact@v3
-    #       with:
-    #         name: openssl.tar.gz
-    #     - name: Unpack sources
-    #       run: |
-    #         mv openssl.tar.gz openssl/
-    #         cd openssl
-    #         tar -xf openssl.tar.gz
-    #     - name: Building
-    #       run: |
-    #         sh build_openssl.sh `pwd`/openssl ${{matrix.target}}
-    #         tar -C openssl -czf openssl-${{matrix.target}}.tar.gz libssl.a libcrypto.a
-    #     - name: Store libraries
-    #       uses: actions/upload-artifact@v3
-    #       with:
-    #         name: openssl-${{matrix.target}}.tar.gz
-    #         path: openssl-${{matrix.target}}.tar.gz
+    build-openssl-ios:
+      runs-on: macos-12
+      needs: [openssl-checkout]
+      strategy:
+        matrix:
+          target: ["ios-arm64"]
+          # target: ["ios-arm64", "ios-x86-64"]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            submodules: 'false'
+        - name: Download OpenSSL
+          uses: actions/download-artifact@v3
+          with:
+            name: openssl.tar.gz
+        - name: Unpack sources
+          run: |
+            mv openssl.tar.gz openssl/
+            cd openssl
+            tar -xf openssl.tar.gz
+        - name: Building
+          run: |
+            sh build_openssl.sh `pwd`/openssl ${{matrix.target}}
+            tar -C openssl -czf openssl-${{matrix.target}}.tar.gz libssl.a libcrypto.a
+        - name: Store libraries
+          uses: actions/upload-artifact@v3
+          with:
+            name: openssl-${{matrix.target}}.tar.gz
+            path: openssl-${{matrix.target}}.tar.gz
 
     build-ffmpeg:
         runs-on: macos-12
-        # needs: [build-openssl-ios]
-        needs: [openssl-checkout]
+        needs: [build-openssl-ios]
         strategy:
           matrix:
             target: ["ios-arm64"]
@@ -78,25 +77,24 @@ jobs:
             uses: actions/download-artifact@v3
             with:
               name: openssl.tar.gz
-          # - name: Download OpenSSL libs
-          #   uses: actions/download-artifact@v3
-          #   with:
-          #     name: openssl-${{matrix.target}}.tar.gz
+          - name: Download OpenSSL libs
+            uses: actions/download-artifact@v3
+            with:
+              name: openssl-${{matrix.target}}.tar.gz
           - name: Download FFmpeg  source
             uses: actions/download-artifact@v3
             with:
               name: ffmpeg.tar.gz
           - name: Unpack sources
             run: |
-              mkdir -p ./FFmpeg/build
-              # mv openssl.tar.gz openssl/
-              # mv openssl-${{matrix.target}}.tar.gz openssl/
+              mkdir -p ./FFmpeg_build
+              mv openssl.tar.gz openssl/
+              mv openssl-${{matrix.target}}.tar.gz openssl/
               mv ffmpeg.tar.gz FFmpeg/
-              # cd openssl
-              # tar -xf openssl.tar.gz
-              # tar -xf openssl-${{matrix.target}}.tar.gz
-              # cd ../FFmpeg
-              cd ./FFmpeg
+              cd openssl
+              tar -xf openssl.tar.gz
+              tar -xf openssl-${{matrix.target}}.tar.gz
+              cd ../FFmpeg
               tar -xf ffmpeg.tar.gz
           - name: Prepare environment
             run: |
@@ -105,7 +103,7 @@ jobs:
               export PATH=$PATH:`pwd`/tools
           - name: Build
             run: |
-              sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl ${{matrix.target}}
+              sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/FFmpeg_build  ${{matrix.target}}
               tar -C FFmpeg -czf ffmpeg-${{matrix.target}}.tar.gz ./build
           - name: Store libraries
             uses: actions/upload-artifact@v3

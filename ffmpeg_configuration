@@ -21,7 +21,7 @@ CONFIGURATION="--enable-debug --enable-shared --enable-pic \
                --enable-filter=scale \
                --enable-filter=aresample \
                --enable-filter=crop \
-               --disable-openssl \
+               --enable-openssl \
                --enable-encoder=aac \
                --enable-encoder=opus \
                --enable-decoder=aac \
