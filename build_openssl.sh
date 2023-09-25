@@ -11,25 +11,32 @@ cd $OPENSSL_DIR
 
 case $TARGET in
     ios-x86-64)
-        ./Configure iossimulator-xcrun no-ssl2 no-shared --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
+        PLATFORM=iossimulator-xcrun
+        EXTRA=""
         ;;
     ios-arm64)
-        ./Configure ios64-xcrun no-ssl2 no-shared --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
+        PLATFORM=ios64-xcrun
+        EXTRA=""
         ;;
-    # android-arm64-v8a)
-    #     ./Configure ios64-xcrun no-ssl2 no-shared
-    #     ;;
-    # android-armeabi-v7a)
-    #     ./Configure ios64-xcrun no-ssl2 no-shared
-    #     ;;
-    # android-x86-64)
-    #     ./Configure android-x86_64 no-ssl2 no-shared
-    #     ;;
+    android-arm64)
+        PLATFORM=android-arm64
+        # Build for android 10
+        EXTRA="-D__ANDROID_API__=29"
+        ;;
+    android-armeabi)
+        PLATFORM=android-arm
+        EXTRA="-D__ANDROID_API__=29"
+        ;;
+    android-x86-64)
+        PLATFORM=android-x86_64
+        EXTRA="-D__ANDROID_API__=29"
+        ;;
     *)
         echo "Unknown target: $TARGET"
         exit 1
         ;;
 esac
 
-MAKEFLAGS=silent make -j3
+./Configure $PLATFORM $EXTRA no-ssl2 no-shared --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
+MAKEFLAGS=make -j4
 make install
