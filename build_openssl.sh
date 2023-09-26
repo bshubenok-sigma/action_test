@@ -22,15 +22,18 @@ case $TARGET in
     android-arm64)
         PLATFORM=android-arm64
         # Build for android 10
-        EXTRA="-D__ANDROID_API__=29"
+        # EXTRA="-D__ANDROID_API__=29"
+        EXTRA=""
         ;;
     android-armeabi)
         PLATFORM=android-arm
-        EXTRA="-D__ANDROID_API__=29"
+        EXTRA=""
+        # EXTRA="-D__ANDROID_API__=29"
         ;;
     android-x86-64)
         PLATFORM=android-x86_64
-        EXTRA="-D__ANDROID_API__=29"
+        EXTRA=""
+        # EXTRA="-D__ANDROID_API__=29"
         ;;
     *)
         echo "Unknown target: $TARGET"

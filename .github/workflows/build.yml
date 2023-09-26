@@ -111,7 +111,8 @@ jobs:
       needs: [openssl-checkout]
       strategy:
         matrix:
-          target: [ "android-arm64", "android-armeabi", "android-x86-64" ]
+          target: [ "android-arm64", "android-armeabi" ]
+          # target: [ "android-arm64", "android-armeabi", "android-x86-64" ]
       steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -144,7 +145,8 @@ jobs:
       needs: [build-openssl-android]
       strategy:
         matrix:
-          target: [ "android-arm64", "android-armeabi", "android-x86-64" ]
+          # target: [ "android-arm64", "android-armeabi", "android-x86-64" ]
+          target: [ "android-arm64", "android-armeabi" ]
       steps:
         - uses: actions/checkout@v4
           with:
