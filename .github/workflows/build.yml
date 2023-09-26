@@ -168,8 +168,7 @@ jobs:
             tar -xf ffmpeg.tar.gz
         - name: Build
           run: |
-            . ffmpeg_configuration
-            sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/ffmpeg_install  ${{matrix.target}}
+            bash -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/ffmpeg_install  ${{matrix.target}}
             tar -C ffmpeg_install -czf ffmpeg-${{matrix.target}}.tar.gz .
         - name: Store libraries
           uses: actions/upload-artifact@v3
