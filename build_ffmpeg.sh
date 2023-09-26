@@ -39,6 +39,7 @@ case $TARGET in
         HOST="linux-x86_64"
         SYSROOT="$ANDROID_NDK_ROOT/sysroot"
         LLVM_TOOLCHAIN="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST/bin"
+        ls -lA "$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt"
         CC=${CC:-$LLVM_TOOLCHAIN/${TARGET}${LEVEL}-clang}
         CXX=${CXX:-$LLVM_TOOLCHAIN/${TARGET}${LEVEL}-clang++}
         AS=$LLVM_TOOLCHAIN/$TARGET-as
@@ -48,7 +49,7 @@ case $TARGET in
         --cross-prefix=arm-linux-androideabi- \
         "
         TOOLCHAIN_FOLDER=$TARGET
-        CONFIGURATION=$CONFIGURATION --disable-static
+        CONFIGURATION="$CONFIGURATION --disable-static"
         ;;
     android-armeabi)
         ;;
