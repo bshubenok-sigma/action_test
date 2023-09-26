@@ -3,7 +3,7 @@
 set -e
 
 # Source the ffmpeg configuration from the configuration file
-source ffmpeg_configuration
+source ./ffmpeg_configuration
 
 # Settings
 FFMPEG_DIR=$1
