@@ -12,6 +12,7 @@ PREFIX=$3
 TARGET=$4
 
 DEPLOYMENT_TARGET="8.0"
+FFMPEG_EXTRA_ARGS=""
 
 case $TARGET in
     ios-x86-64)
@@ -31,6 +32,23 @@ case $TARGET in
         AS="gas-preprocessor.pl -arch ${ARCH} -- $CC"
         ;;
     android-arm64)
+        PLATFORM=android
+        ARCH="arm64"
+        TARGET="aarch64-linux-android"
+        LEVEL="21"
+        HOST="linux-x86_64"
+        SYSROOT="$ANDROID_NDK_ROOT/sysroot"
+        LLVM_TOOLCHAIN="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST/bin"
+        CC=${CC:-$LLVM_TOOLCHAIN/${TARGET}${LEVEL}-clang}
+        CXX=${CXX:-$LLVM_TOOLCHAIN/${TARGET}${LEVEL}-clang++}
+        AS=$LLVM_TOOLCHAIN/$TARGET-as
+        CFLAGS="$CFLAGS -mfpu=neon -fPIC"
+        FFMPEG_EXTRA_ARGS="\
+        --target-os=linux \
+        --cross-prefix=arm-linux-androideabi- \
+        "
+        TOOLCHAIN_FOLDER=$TARGET
+        CONFIGURATION=$CONFIGURATION --disable-static
         ;;
     android-armeabi)
         ;;
@@ -49,13 +67,15 @@ LDFLAGS="$CFLAGS"
 pushd $FFMPEG_DIR
         ./configure $CONFIGURATION \
                 --enable-cross-compile \
+                --disable-stripping \
                 --cc="$CC" \
                 --as="$AS" \
                 --arch="$ARCH" \
                 --sysroot="$SYSROOT" \
                 --prefix="$PREFIX" \
-                --extra-cflags="-I$OPENSSL_DIR/include" \
-                --extra-ldflags="-L$OPENSSL_DIR/lib"
+                --extra-cflags="-I$OPENSSL_DIR/include -I$NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include $CFLAGS -D__ANDROID_API__=$LEVEL" \
+                --extra-ldflags="-L$OPENSSL_DIR/lib -L$NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/$TARGET/$LEVEL $LDFLAGS" \
+                $FFMPEG_EXTRA_ARGS
         make -j4
         make install
 popd
