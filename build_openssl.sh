@@ -5,35 +5,42 @@ OPENSSL_DIR=$1
 INSTALL_DIR=$2
 TARGET=$3
 
-
 mkdir -p $INSTALL_DIR
 cd $OPENSSL_DIR
-PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+case $TARGET in
+    android-*)
+        unameOut="$(uname -s)"
+        case "${unameOut}" in
+            Linux*)
+                HOST="linux-x86_64"
+            ;;
+            Darwin*)
+                HOST="darwin-x86_64"
+            ;;
+            *)
+                echo "Unsuported HOST: ${unameOut}"
+                exit 1
+        esac
+        PATH=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/${HOST}/bin:$PATH
+    ;;
+    *)
+esac
 
 case $TARGET in
     ios-x86-64)
         PLATFORM=iossimulator-xcrun
-        EXTRA=""
         ;;
     ios-arm64)
         PLATFORM=ios64-xcrun
-        EXTRA=""
         ;;
-    android-arm64)
+    android-arm64-v8a)
         PLATFORM=android-arm64
-        # Build for android 10
-        # EXTRA="-D__ANDROID_API__=29"
-        EXTRA=""
         ;;
-    android-armeabi)
+    android-aarmeabi-v7a)
         PLATFORM=android-arm
-        EXTRA=""
-        # EXTRA="-D__ANDROID_API__=29"
         ;;
-    android-x86-64)
+    android-x86_64)
         PLATFORM=android-x86_64
-        EXTRA=""
-        # EXTRA="-D__ANDROID_API__=29"
         ;;
     *)
         echo "Unknown target: $TARGET"

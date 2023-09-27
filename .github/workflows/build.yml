@@ -109,12 +109,12 @@ jobs:
               path: ffmpeg-${{matrix.target}}.tar.gz
 
 
-    build-openssl-android:
+    build-android:
       runs-on: ubuntu-22.04
       needs: [openssl-checkout]
       strategy:
         matrix:
-          target: [ "android-arm64", "android-armeabi", "android-x86-64" ]
+          target: [ "android-arm64-v8a", "android-aarmeabi-v7a", "android-x86_64" ]
       steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -124,59 +124,23 @@ jobs:
           uses: actions/download-artifact@v3
           with:
             name: openssl.tar.gz
-        - name: Unpack sources
-          run: |
-            mv openssl.tar.gz openssl/
-            cd openssl
-            tar -xf openssl.tar.gz
-        - name: Building
-          run: |
-            mkdir -p openssl_install
-            sh -x build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
-            tar -C openssl_install -czf openssl-${{matrix.target}}.tar.gz .
-
-        - name: Store build artifacts
-          uses: actions/upload-artifact@v3
-          with:
-            name: openssl-${{matrix.target}}.tar.gz
-            path: openssl-${{matrix.target}}.tar.gz
-
-
-    build-ffmpeg-android:
-      runs-on: ubuntu-22.04
-      needs: [build-openssl-android]
-      strategy:
-        matrix:
-          target: [ "android-arm64", "android-armeabi", "android-x86-64" ]
-      steps:
-        - uses: actions/checkout@v4
-          with:
-            submodules: 'false'
-        - name: Download OpenSSL libs
-          uses: actions/download-artifact@v3
-          with:
-            name: openssl-${{matrix.target}}.tar.gz
-        - name: Download FFmpeg sources
+        - name: Download FFmpeg
           uses: actions/download-artifact@v3
           with:
             name: ffmpeg.tar.gz
         - name: Unpack sources
           run: |
-            mkdir -p ./ffmpeg_install
-            mv openssl-${{matrix.target}}.tar.gz openssl/
+            mv openssl.tar.gz openssl/
             mv ffmpeg.tar.gz FFmpeg/
             cd openssl
-            tar -xf openssl-${{matrix.target}}.tar.gz
+            tar -xf openssl.tar.gz
             cd ../FFmpeg
             tar -xf ffmpeg.tar.gz
-        - name: Build
+        - name: Building
           run: |
-            bash -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/ffmpeg_install  ${{matrix.target}}
-            tar -C ffmpeg_install -czf ffmpeg-${{matrix.target}}.tar.gz .
-        - name: Store libraries
+            bash -x build_app.sh ${{matrix.target}}
+        - name: Store build artifacts
           uses: actions/upload-artifact@v3
           with:
-            name: ffmpeg-${{matrix.target}}.tar.gz
-            path: ffmpeg-${{matrix.target}}.tar.gz
-
-
+            name: libs-${{matrix.target}}.tar.gz
+            path: libs-${{matrix.target}}.tar.gz
