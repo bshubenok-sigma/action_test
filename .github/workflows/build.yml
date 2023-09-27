@@ -13,10 +13,10 @@ jobs:
             uses: actions/checkout@v4
             with:
               submodules: 'recursive'
-          - name: Patch sources
-            run: |
-              cd FFmpeg
-              find ../patches/ffmpeg -type f -name '*.patch' -print0 | sort -z | xargs -t -0 -n 1 patch -i
+          # - name: Patch sources
+          #   run: |
+          #     cd FFmpeg
+          #     find ../patches/ffmpeg -type f -name '*.patch' -print0 | sort -z | xargs -t -0 -n 1 patch -i
           - name: Cleanup and pack
             run: |
                 rm -rf openssl/.git*
