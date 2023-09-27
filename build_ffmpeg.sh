@@ -55,7 +55,7 @@ case $TARGET in
     android-armeabi)
         PLATFORM=android
         ARCH="arm"
-        TARGET="arm-linux-androideabi"
+        TARGET="armv7a-linux-androideabi"
         HOST="linux-x86_64"
         SYSROOT="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST/sysroot"
         LLVM_TOOLCHAIN="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST/bin"
@@ -81,7 +81,7 @@ case $TARGET in
         CC=${CC:-$LLVM_TOOLCHAIN/${TARGET}${ANDROID_LEVEL}-clang}
         CXX=${CXX:-$LLVM_TOOLCHAIN/${TARGET}${ANDROID_LEVEL}-clang++}
         AS=${AS:-$LLVM_TOOLCHAIN/${TARGET}${ANDROID_LEVEL}-clang}
-        EXTRA_CFLAGS="-target x86_64-none-linux-androideabi -msse4.2 -mpopcnt -m64 -mtune=intel -DANDROID_PLATFORM=android-${ANDROID_LEVEL} -I$SYSROOT/usr/include"
+        EXTRA_CFLAGS="-target x86_64-none-linux-androideabi -msse4.2 -mpopcnt -m64 -DANDROID_PLATFORM=android-${ANDROID_LEVEL} -I$SYSROOT/usr/include"
         EXTRA_LDFLAGS="-L$SYSROOT/usr/lib/$TARGET/$LEVEL"
         FFMPEG_EXTRA_ARGS="\
             --target-os=android \

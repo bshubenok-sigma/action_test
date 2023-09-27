@@ -72,6 +72,23 @@ case $TARGET in
         CONFIGURATION="$CONFIGURATION --disable-static"
         ;;
     android-x86-64)
+        PLATFORM=android
+        ARCH="x86_64"
+        TARGET="x86_64-linux-android"
+        HOST="linux-x86_64"
+        SYSROOT="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST/sysroot"
+        LLVM_TOOLCHAIN="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST/bin"
+        CC=${CC:-$LLVM_TOOLCHAIN/${TARGET}${ANDROID_LEVEL}-clang}
+        CXX=${CXX:-$LLVM_TOOLCHAIN/${TARGET}${ANDROID_LEVEL}-clang++}
+        AS=${AS:-$LLVM_TOOLCHAIN/${TARGET}${ANDROID_LEVEL}-clang}
+        EXTRA_CFLAGS="-target x86_64-none-linux-androideabi -msse4.2 -mpopcnt -m64 -mtune=intel -DANDROID_PLATFORM=android-${ANDROID_LEVEL} -I$SYSROOT/usr/include"
+        EXTRA_LDFLAGS="-L$SYSROOT/usr/lib/$TARGET/$LEVEL"
+        FFMPEG_EXTRA_ARGS="\
+            --target-os=android \
+            --strip=true \
+        "
+        TOOLCHAIN_FOLDER=$TARGET
+        CONFIGURATION="$CONFIGURATION --disable-static"
         ;;
     *)
         echo "Unknown target: $TARGET"
@@ -82,16 +99,16 @@ esac
 # cd into ffmpeg root directory and build ffmpeg
 pushd $FFMPEG_DIR
         ./configure $CONFIGURATION \
-                --enable-cross-compile \
-                --disable-stripping \
-                --cc="$CC" \
-                --as="$AS" \
-                --arch="$ARCH" \
-                --sysroot="$SYSROOT" \
-                --prefix="$PREFIX" \
-                --extra-cflags="-I$OPENSSL_DIR/include $EXTRA_CFLAGS" \
-                --extra-ldflags="-L$OPENSSL_DIR/lib $EXTRA_LDFLAGS" \
-                $FFMPEG_EXTRA_ARGS
+            --enable-cross-compile \
+            --disable-stripping \
+            --cc="$CC" \
+            --as="$AS" \
+            --arch="$ARCH" \
+            --sysroot="$SYSROOT" \
+            --prefix="$PREFIX" \
+            --extra-cflags="-I$OPENSSL_DIR/include $EXTRA_CFLAGS" \
+            --extra-ldflags="-L$OPENSSL_DIR/lib $EXTRA_LDFLAGS" \
+            $FFMPEG_EXTRA_ARGS
         make -j4
         make install
 popd
