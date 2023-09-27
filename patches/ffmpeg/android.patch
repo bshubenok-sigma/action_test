@@ -1,0 +1,13 @@
+diff --git a/configure b/configure
+index fb55e04ee7..628201e3b1 100755
+--- a/configure
++++ b/configure
+@@ -5342,7 +5342,7 @@ case $target_os in
+         add_ldexeflags -fPIE -pie
+         SLIB_INSTALL_NAME='$(SLIBNAME)'
+         SLIB_INSTALL_LINKS=
+-        SHFLAGS='-shared -Wl,-soname,$(SLIBNAME)'
++        SHFLAGS='-shared -soname $(SLIBNAME)'
+         ;;
+     haiku)
+         prefix_default="/boot/common"

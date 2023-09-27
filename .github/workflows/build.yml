@@ -13,6 +13,10 @@ jobs:
             uses: actions/checkout@v4
             with:
               submodules: 'recursive'
+          - name: Patch sources
+            run: |
+              cd FFmpeg
+              find ../patches/ffmpeg -type f -name '*.patch' -print0 | sort -z | xargs -t -0 -n 1 patch -i
           - name: Cleanup and pack
             run: |
                 rm -rf openssl/.git*
@@ -30,80 +34,79 @@ jobs:
               name: ffmpeg.tar.gz
               path: ffmpeg.tar.gz
 
+    build-openssl-ios:
+      runs-on: macos-12
+      needs: [openssl-checkout]
+      strategy:
+        matrix:
+          target: ["ios-arm64", "ios-x86-64"]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            submodules: 'false'
+        - name: Download OpenSSL
+          uses: actions/download-artifact@v3
+          with:
+            name: openssl.tar.gz
+        - name: Unpack sources
+          run: |
+            mv openssl.tar.gz openssl/
+            cd openssl
+            tar -xf openssl.tar.gz
+        - name: Building
+          run: |
+            mkdir -p openssl_install
+            sh build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
+            tar -C openssl_install -czf openssl-${{matrix.target}}.tar.gz .
 
-    # build-openssl-ios:
-    #   runs-on: macos-12
-    #   needs: [openssl-checkout]
-    #   strategy:
-    #     matrix:
-    #       target: ["ios-arm64", "ios-x86-64"]
-    #   steps:
-    #     - name: Checkout
-    #       uses: actions/checkout@v4
-    #       with:
-    #         submodules: 'false'
-    #     - name: Download OpenSSL
-    #       uses: actions/download-artifact@v3
-    #       with:
-    #         name: openssl.tar.gz
-    #     - name: Unpack sources
-    #       run: |
-    #         mv openssl.tar.gz openssl/
-    #         cd openssl
-    #         tar -xf openssl.tar.gz
-    #     - name: Building
-    #       run: |
-    #         mkdir -p openssl_install
-    #         sh build_openssl.sh `pwd`/openssl `pwd`/openssl_install  ${{matrix.target}}
-    #         tar -C openssl_install -czf openssl-${{matrix.target}}.tar.gz .
+        - name: Store build artifacts
+          uses: actions/upload-artifact@v3
+          with:
+            name: openssl-${{matrix.target}}.tar.gz
+            path: openssl-${{matrix.target}}.tar.gz
 
-    #     - name: Store build artifacts
-    #       uses: actions/upload-artifact@v3
-    #       with:
-    #         name: openssl-${{matrix.target}}.tar.gz
-    #         path: openssl-${{matrix.target}}.tar.gz
-
-    # build-ffmpeg-ios:
-    #     runs-on: macos-12
-    #     needs: [build-openssl-ios]
-    #     strategy:
-    #       matrix:
-    #         target: ["ios-arm64", "ios-x86-64" ]
-    #     steps:
-    #       - uses: actions/checkout@v4
-    #         with:
-    #           submodules: 'false'
-    #       - name: Download OpenSSL libs
-    #         uses: actions/download-artifact@v3
-    #         with:
-    #           name: openssl-${{matrix.target}}.tar.gz
-    #       - name: Download FFmpeg  source
-    #         uses: actions/download-artifact@v3
-    #         with:
-    #           name: ffmpeg.tar.gz
-    #       - name: Unpack sources
-    #         run: |
-    #           mkdir -p ./ffmpeg_install
-    #           mv openssl-${{matrix.target}}.tar.gz openssl/
-    #           mv ffmpeg.tar.gz FFmpeg/
-    #           cd openssl
-    #           tar -xf openssl-${{matrix.target}}.tar.gz
-    #           cd ../FFmpeg
-    #           tar -xf ffmpeg.tar.gz
-    #       - name: Prepare environment
-    #         run: |
-    #           brew install nasm
-    #           chmod +x ./tools/gas-preprocessor.pl
-    #           export PATH=$PATH:`pwd`/tools
-    #       - name: Build
-    #         run: |
-    #           sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/ffmpeg_install  ${{matrix.target}}
-    #           tar -C ffmpeg_install -czf ffmpeg-${{matrix.target}}.tar.gz .
-    #       - name: Store libraries
-    #         uses: actions/upload-artifact@v3
-    #         with:
-    #           name: ffmpeg-${{matrix.target}}.tar.gz
-    #           path: ffmpeg-${{matrix.target}}.tar.gz
+    build-ffmpeg-ios:
+        runs-on: macos-12
+        needs: [build-openssl-ios]
+        strategy:
+          matrix:
+            target: ["ios-arm64", "ios-x86-64" ]
+        steps:
+          - uses: actions/checkout@v4
+            with:
+              submodules: 'false'
+          - name: Download OpenSSL libs
+            uses: actions/download-artifact@v3
+            with:
+              name: openssl-${{matrix.target}}.tar.gz
+          - name: Download FFmpeg  source
+            uses: actions/download-artifact@v3
+            with:
+              name: ffmpeg.tar.gz
+          - name: Unpack sources
+            run: |
+              mkdir -p ./ffmpeg_install
+              mv openssl-${{matrix.target}}.tar.gz openssl/
+              mv ffmpeg.tar.gz FFmpeg/
+              cd openssl
+              tar -xf openssl-${{matrix.target}}.tar.gz
+              cd ../FFmpeg
+              tar -xf ffmpeg.tar.gz
+          - name: Prepare environment
+            run: |
+              brew install nasm
+              chmod +x ./tools/gas-preprocessor.pl
+              export PATH=$PATH:`pwd`/tools
+          - name: Build
+            run: |
+              sh -x build_ffmpeg.sh `pwd`/FFmpeg `pwd`/openssl `pwd`/ffmpeg_install  ${{matrix.target}}
+              tar -C ffmpeg_install -czf ffmpeg-${{matrix.target}}.tar.gz .
+          - name: Store libraries
+            uses: actions/upload-artifact@v3
+            with:
+              name: ffmpeg-${{matrix.target}}.tar.gz
+              path: ffmpeg-${{matrix.target}}.tar.gz
 
 
     build-openssl-android:
