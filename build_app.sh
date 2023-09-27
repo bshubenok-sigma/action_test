@@ -19,15 +19,15 @@ IOS_DEPLOYMENT_TARGET="11.0"
 ANDROID_LEVEL="29"
 
 case $TARGET in
+    ios)
+        for arch in [ "arm64", "x86-64" ]; do
+            build_libs "ios"-${arch}
+        done
+    ;;
+
     ios-*)
-        PLATFORM=iphonesimulator
-        ARCH="x86_64"
-        SYSROOT=$(xcrun --sdk $PLATFORM --show-sdk-path)
-        CC="$(xcrun --sdk $PLATFORM --find clang) -isysroot=${SYSROOT} -arch ${ARCH}"
-        CFLAGS="$CFLAGS -mios-simulator-version-min=$IOS_DEPLOYMENT_TARGET"
-        LDFLAGS="$CFLAGS"
-        AS="gas-preprocessor.pl -arch ${ARCH} -- $CC"
-        ;;
+        build_libs $TARGET
+    ;;
 
     android)
         if [ -z "$ANDROID_NDK_ROOT" ]; then
@@ -39,7 +39,8 @@ case $TARGET in
             build_libs "android"-${arch}
         done
 
-        ;;
+    ;;
+
     android-*)
         if [ -z "$ANDROID_NDK_ROOT" ]; then
             echo "Please make sure to set ANDROID_NDK_ROOT"
@@ -47,6 +48,7 @@ case $TARGET in
         fi
         build_libs $TARGET
     ;;
+
     *)
         echo "Unknown target: $TARGET"
         exit 1
