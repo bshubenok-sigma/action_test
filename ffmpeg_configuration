@@ -1,5 +1,4 @@
 CONFIGURATION="--enable-debug --enable-shared --enable-pic \
-               --disable-doc \
                --disable-programs \
                --disable-asm \
                --disable-symver \
