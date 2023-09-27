@@ -5,8 +5,8 @@ OPENSSL_DIR=$1
 INSTALL_DIR=$2
 TARGET=$3
 
-mkdir -p $INSTALL_DIR
 cd $OPENSSL_DIR
+
 case $TARGET in
     android-*)
         unameOut="$(uname -s)"
@@ -21,7 +21,8 @@ case $TARGET in
                 echo "Unsuported HOST: ${unameOut}"
                 exit 1
         esac
-        PATH=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/${HOST}/bin:$PATH
+        export ANDROID_NDK_HOME=${ANDROID_NDK_ROOT}
+        PATH=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${HOST}/bin:$PATH
     ;;
     *)
 esac
@@ -50,4 +51,4 @@ esac
 
 ./Configure $PLATFORM $EXTRA no-ssl2 no-shared --prefix=$INSTALL_DIR --openssldir=$INSTALL_DIR
 make -j4
-make install
+make install_sw

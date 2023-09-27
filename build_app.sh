@@ -1,6 +1,17 @@
 #!/bin/bash -x
 set -e
 
+build_libs() {
+    arch=$1
+    LIBS_INSTALL_PATH=`pwd`/install/${arch}
+    mkdir -p ${LIBS_INSTALL_PATH}
+    bash -x build_openssl.sh `pwd`/openssl ${LIBS_INSTALL_PATH} ${arch}
+    bash -x build_ffmpeg.sh `pwd`/FFmpeg ${LIBS_INSTALL_PATH} ${LIBS_INSTALL_PATH} ${arch}
+
+    tar -C ${LIBS_INSTALL_PATH} -czf libs-${arch}.tar.gz .
+}
+
+
 # Settings
 TARGET=$1
 
@@ -17,16 +28,18 @@ case $TARGET in
         LDFLAGS="$CFLAGS"
         AS="gas-preprocessor.pl -arch ${ARCH} -- $CC"
         ;;
+
     android)
         if [ -z "$ANDROID_NDK_ROOT" ]; then
             echo "Please make sure to set ANDROID_NDK_ROOT"
             exit 1
         fi
 
-        foreach arch ("arm64-v8a" "armeabi-v7a" "x86_64")
+        for arch in ["arm64-v8a" "armeabi-v7a" "x86_64"]; do
             build_libs "android"-${arch}
-        end
-    ;;
+        done
+
+        ;;
     android-*)
         if [ -z "$ANDROID_NDK_ROOT" ]; then
             echo "Please make sure to set ANDROID_NDK_ROOT"
@@ -39,14 +52,3 @@ case $TARGET in
         exit 1
         ;;
 esac
-
-build_libs() {
-    arch=$1
-    LIBS_INSTALL_PATH=`pwd`/install/${arch}
-    mkdir -p ${LIBS_INSTALL_PATH}
-    bash -x build_openssl.sh `pwd`/openssl ${LIBS_INSTALL_PATH}
-    bash -x build_ffmpeg.sh `pwd`/FFmpeg ${LIBS_INSTALL_PATH} ${LIBS_INSTALL_PATH}
-
-    tar -C ${LIBS_INSTALL_PATH} -czf libs-${arch}.tar.gz .
-
-}
